@@ -79,12 +79,18 @@ public class Sudoku {
 	}
 	public boolean checkIfUsed(int num, boolean[] list){
 		int index = num-1;
-		if (list[index] == false){
-			list[index] = true; //set now to true.
-			return false;     //return false. it has not been used
-		}else{
-			return true; //else, return true, meaning that it has been used
-		}		
+		while (index <= list.length){
+			if (list[index] == false){
+				list[index] = true; //set now to true.
+				return false;     //return false. it has not been used
+			} 
+			index+=1;
+//			else{
+//				return true; //else, return true, meaning that it has been used
+//			}
+		}
+		return true;
+				
 	}
 	
 	public void resetList(boolean[] l){
@@ -92,7 +98,7 @@ public class Sudoku {
 			l[i] = false;
 		}
 	}
-	
+//------------------------------------------------------------------------------------------------------------------------
 //function will return a 2D array, which is then printed later
 	public boolean fillBoard(int row, int col){
 		int num = produceRandNum();
@@ -100,65 +106,21 @@ public class Sudoku {
 		
 		//first, check if the random number that was generated had already been used
 		boolean used = checkIfUsed(num, list);
-		if (row > 8){
-			return true;
-		}
-		if (col > 8){
-			return true;
-		}
-		//check if num generated was 0
-		
-		if (num == 0){
-			num = 1;
-		}
-		while (num != 9 && num != 0){
-			if (row >= 0 && row <=9){
-				if (isSafeToPlace(num, row, col) == true && !used){
-					fillBoard(row + 1, col);
-				}
+		for (int i = 0; i <9; i++){
+			if (isSafeToPlace(num, row, col) == true && used == false){
+				board[row][col] = num;
+			}else{
+				fillBoard(i+1, col);
 			}
+
 		}
-		num = 1;
 		resetList(list);
 
 		board[row][col] = 0; //takes care of backtracking
 		return false;
-		//reset list
-		
-			
-//			else{
-//				//used is true, so we must use a different number. Thus, calling on fillboard function again to produce a random number
-//				fillBoard(row + 1, col);
-//				return true;
-//			}
-//			
-//		}
-		
-		
-		//then, check if the spot on the board is empty
-//		if (board[row][col] != 0){
-//			int temp_index = board[row][col]-1;
-//			//change the value in list to be true
-//			list[temp_index] = true; 
-//			return fillBoard(row +1, col);
-//		}
-		
-		//if empty, then we can place num in after checking subgrid, row, col
-		
-		
-		//while the number has not been used and it is safe to place
-		
-		
-		
-		//first check if the spot in the board is filled, if not, check if the number has been used from the random number generator
-		//if yes, then increment the number. Then, call on fillboard again but incrementing the row and col
-		
-		
-//		
-		       
-		
 	}
-	
+//------------------------------------------------------------------------------------------------------------------------
+
 	public static void printBoard(int[][] board){
 		for(int i = 0; i < 9; ++i){
 			if (i % 3 ==0){
