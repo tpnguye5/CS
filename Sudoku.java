@@ -62,110 +62,148 @@ public class Sudoku {
 	 * Return: boolean
 	 */
 	public boolean isSafeToPlace(int num, int row, int col){
-		for (int i=0; i < board.length; i++){
-			if (board[i][col]== num){
-				return false; //not safe to place
-			}
-		}
-		
-		for (int j = 0; j < board.length; j++){
-			if (board[row][j]== num){
-				return false;
-			}
-		}
-		
-		int r = returnStartOfSubGrid(row);
-		int c = returnStartOfSubGrid(col);
-		
-		for (int k = r; k < r+3; k++){
-			for (int l = c; l < c+3; l++){
-				if (board[k][l] == num){
-					return false;
-				}	
-			}
-		}
-//		if (checkSubGrid(num, row, col) && checkRow(num, row) && checkCol(num, col)){
-//			return true;
+//		for (int i=0; i < board.length; i++){
+//			if (board[i][col]== num){ 				//row
+//				return false; //not safe to place
+//			}
 //		}
+//		
+//		for (int j = 0; j < board.length; j++){ 	//col
+//			if (board[row][j]== num){
+//				return false;
+//			}
+//		}
+//		
+//		int r = returnStartOfSubGrid(row);			//subgrid
+//		int c = returnStartOfSubGrid(col);
+//		
+//		for (int k = r; k < r+3; k++){
+//			for (int l = c; l < c+3; l++){
+//				if (board[k][l] == num){
+//					return false;
+//				}	
+//			}
+//		}
+		if (checkSubGrid(num, row, col) && checkRow(num, row) && checkCol(num, col)){
+			return true;
+		}
 //			
-		return true;
-	}
-	
-	public boolean checkIfNOTUsed(int num, boolean[] list){
-		int index = num;
-		while (index < list.length){
-			if (list[index] == false){
-				return true;     //return false. it has not been used
-			} 
-			index++;
-		}
 		return false;
-		
 	}
 	
-	protected int getNextNum(int row, int col, boolean[] visited){
-		Random rand = new Random();
-		int num = rand.nextInt(9);   //picks a random number between 0 and 9
-		//check row, col, subgrid, check if has not placed
-		int i = 0;
-		
-		while (i < 9){
-//			System.out.println(isSafeToPlace(num, row, col));
-//			System.out.println(checkIfNOTUsed(num, visited));
-//			System.out.println("--------------------------------");
-			
-//			if (checkIfNOTUsed(num, visited)){
-				if (isSafeToPlace(num, row, col)){
-					//set visited to be true
-					visited[i] = true;
-					return num;
+//	public boolean checkIfNOTUsed(int num, boolean[] list){
+//		int index = num;
+//		while (index < list.length){
+//			if (list[index] == false){
+//				return true;     //return false. it has not been used
+//			} 
+//			index++;
+//		}
+//		return false;
+//		
+//	}
+	
+//	protected int getNextNum(int row, int col, boolean[] visited){
+//		Random rand = new Random();
+//		int num = rand.nextInt(9);   //picks a random number between 0 and 9
+//		//check row, col, subgrid, check if has not placed
+//		int i = 0;
+//		
+//		while (i < 9){
+////			System.out.println(isSafeToPlace(num, row, col));
+////			System.out.println(checkIfNOTUsed(num, visited));
+////			System.out.println("--------------------------------");
+//			
+////			if (checkIfNOTUsed(num, visited)){
+//			if (isSafeToPlace(num, row, col)){
+//				//set visited to be true
+//				visited[i] = true;
+//				return num;
+////				}
+//				
+//			}else{
+//				if (num <= 9){
+//					num = 1;
+//				}else{
+//					num++;
 //				}
-				
-			}else{
-				if (num <= 9){
-					num = 1;
-				}else{
-					num++;
-				}
-				i ++;
-			}
-		}
-		return -1;
-	}
+//				i ++;
+//			}
+//		}
+//		return -1;
+//	}
 	
 //------------------------------------------------------------------------------------------------------------------------
 //function will return a 2D array, which is then printed later
 	public boolean fillBoard(int row, int col){
-		System.out.println("row:" + row + " col :" + col);
-
-		if (col >= board.length-1){
-			col = 0;
-			row = row+ 1;
-		}
-		if (row >= board.length-1){
+//		System.out.println("row:" + row + " col :" + col);
+//		printBoard(board);
+		Random rand = new Random();
+		int num = rand.nextInt(9);
+		if (row > 8){
 			return true;
 		}
+		
+		System.out.println("************************");
+		
+		
+		
+		int[] tries = new int[9];
+		int first = rand.nextInt(9);
+		
+		for (int i = 0; i < board.length-1; i++){
+			tries[i] = (first + i) %9 + 1;
+		}
+		
+		for (int j = 0; j < board.length-1; j++){
+			int attempt = tries[j];
+			
+			if (isSafeToPlace(attempt, row, col)){
+				board[row][col] = attempt;
+				
+				if (col < 8){
+					if (fillBoard(row, col + 1)){
+						return true;
+					}
+				}else{
+					if (fillBoard(row + 1, 0)){
+						return true;
+					}
+				}
+//				if (col >= board.length-1){
+//					col = 0;
+//					row = row+ 1;
+//				}
+//				if (row >= board.length-1){
+//					return true;
+//				}
+			}
+		}
+		
+		
+		
+		
 //		System.out.println("row:" + row + " col :" + col);
 		
-		boolean[] visited = {false, false, false, false, false, false, false, false, false};
-
-		for (int i = 1; i <= board.length; i++){
-			int num = getNextNum(row, col, visited);
-			if (num != -1){
-				board[row][col]= num;
-
-//				if (isSafeToPlace(num, row, col)){
-//				board[row][col] = num;
+//		boolean[] visited = {false, false, false, false, false, false, false, false, false};
+//
+//		for (int i = 1; i <= board.length; i++){
+//			int num = getNextNum(row, col, visited);
+//			if (num != -1){
+//				board[row][col]= num;
+//
+////				if (isSafeToPlace(num, row, col)){
+////				board[row][col] = num;
+////				}
+//				if (fillBoard(row, col + 1)){
+//	//				System.out.println(col);
+//					return true;
+//				}else{
+//					board[row][col] = 0;
 //				}
-				if (fillBoard(row, col + 1)){
-	//				System.out.println(col);
-					return true;
-				}else{
-					board[row][col] = 0;
-				}
-				}
-			
-		}
+//				}
+//			
+//		}
 		
 //		int num;
 //		
@@ -211,7 +249,7 @@ public class Sudoku {
 //		sudoku.printBoard(board);
 
 		if (sudoku.fillBoard(row, col)==true){
-			System.out.println("ji");
+//			System.out.println("ji");
 			sudoku.printBoard(board);
 		}	
 	}
