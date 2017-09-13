@@ -14,11 +14,6 @@ public class Sudoku {
 		return result;
 	}
 	
-	protected int produceRandNum(){
-		Random rand = new Random();
-		int num = rand.nextInt(9);   //picks a random number between 0 and 9
-		return num;
-	}
 
 	public boolean checkRow(int num, int row){
 		for (int i=0; i < board.length; i++){
@@ -67,57 +62,129 @@ public class Sudoku {
 	 * Return: boolean
 	 */
 	public boolean isSafeToPlace(int num, int row, int col){
-		//check subgrid, if the number is safe to place
-		if (checkSubGrid(num, row, col) == true){
-			if (checkRow(num, row)== true){
-				if (checkCol(num, col)== true){
-					return true;
-				}
+		for (int i=0; i < board.length; i++){
+			if (board[i][col]== num){
+				return false; //not safe to place
 			}
 		}
-		return false;
-	}
-	public boolean checkIfUsed(int num, boolean[] list){
-		int index = num-1;
-		while (index <= list.length){
-			if (list[index] == false){
-				list[index] = true; //set now to true.
-				return false;     //return false. it has not been used
-			} 
-			index+=1;
-//			else{
-//				return true; //else, return true, meaning that it has been used
-//			}
+		
+		for (int j = 0; j < board.length; j++){
+			if (board[row][j]== num){
+				return false;
+			}
 		}
+		
+		int r = returnStartOfSubGrid(row);
+		int c = returnStartOfSubGrid(col);
+		
+		for (int k = r; k < r+3; k++){
+			for (int l = c; l < c+3; l++){
+				if (board[k][l] == num){
+					return false;
+				}	
+			}
+		}
+//		if (checkSubGrid(num, row, col) && checkRow(num, row) && checkCol(num, col)){
+//			return true;
+//		}
+//			
 		return true;
-				
 	}
 	
-	public void resetList(boolean[] l){
-		for (int i = 0; i < l.length; i++){
-			l[i] = false;
+	public boolean checkIfNOTUsed(int num, boolean[] list){
+		int index = num;
+		while (index < list.length){
+			if (list[index] == false){
+				return true;     //return false. it has not been used
+			} 
+			index++;
 		}
+		return false;
+		
 	}
+	
+	protected int getNextNum(int row, int col, boolean[] visited){
+		Random rand = new Random();
+		int num = rand.nextInt(9);   //picks a random number between 0 and 9
+		//check row, col, subgrid, check if has not placed
+		int i = 0;
+		
+		while (i < 9){
+//			System.out.println(isSafeToPlace(num, row, col));
+//			System.out.println(checkIfNOTUsed(num, visited));
+//			System.out.println("--------------------------------");
+			
+//			if (checkIfNOTUsed(num, visited)){
+				if (isSafeToPlace(num, row, col)){
+					//set visited to be true
+					visited[i] = true;
+					return num;
+//				}
+				
+			}else{
+				if (num <= 9){
+					num = 1;
+				}else{
+					num++;
+				}
+				i ++;
+			}
+		}
+		return -1;
+	}
+	
 //------------------------------------------------------------------------------------------------------------------------
 //function will return a 2D array, which is then printed later
 	public boolean fillBoard(int row, int col){
-		int num = produceRandNum();
-		boolean[] list = {false, false, false, false, false, false, false, false, false};
-		
-		//first, check if the random number that was generated had already been used
-		boolean used = checkIfUsed(num, list);
-		for (int i = 0; i <9; i++){
-			if (isSafeToPlace(num, row, col) == true && used == false){
-				board[row][col] = num;
-			}else{
-				fillBoard(i+1, col);
-			}
+		System.out.println("row:" + row + " col :" + col);
 
+		if (col >= board.length-1){
+			col = 0;
+			row = row+ 1;
 		}
-		resetList(list);
+		if (row >= board.length-1){
+			return true;
+		}
+//		System.out.println("row:" + row + " col :" + col);
+		
+		boolean[] visited = {false, false, false, false, false, false, false, false, false};
 
+		for (int i = 1; i <= board.length; i++){
+			int num = getNextNum(row, col, visited);
+			if (num != -1){
+				board[row][col]= num;
+
+//				if (isSafeToPlace(num, row, col)){
+//				board[row][col] = num;
+//				}
+				if (fillBoard(row, col + 1)){
+	//				System.out.println(col);
+					return true;
+				}else{
+					board[row][col] = 0;
+				}
+				}
+			
+		}
+		
+//		int num;
+//		
+//		while ((num= getNextNum(row, col, visited)) != -1){
+//			//always give next num
+//			//place num
+//			board[row][col]= num;
+//			
+//			if (fillBoard(row, col + 1)){
+////				System.out.println(col);
+//				return true;
+//			}else{
+//				board[row][col] = 0;
+//			}
+//		}
+		
 		board[row][col] = 0; //takes care of backtracking
 		return false;
+		
 	}
 //------------------------------------------------------------------------------------------------------------------------
 
@@ -144,8 +211,8 @@ public class Sudoku {
 //		sudoku.printBoard(board);
 
 		if (sudoku.fillBoard(row, col)==true){
+			System.out.println("ji");
 			sudoku.printBoard(board);
-
 		}	
 	}
 	
